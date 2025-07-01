@@ -1,89 +1,51 @@
-# Datasets
-## Type:  Multi-layers Graph
+# Density Decomposition of Multilayer Graphs
 
-## example graph name: AUCS
+This project focuses on the density decomposition of multilayer graphs. 
 
-In this graph, the multiple layers represent relationships between 61 employees of a University department in five different aspects: (i) coworking, (ii) having lunch together, (iii) Facebook friendship, (iv) offline friendship (having fun together), and (v) coauthor-ship.
+## Dataset
 
+Download datasets and put them into the `/dataset` folder. An example file `homo` is provided.
 
+## Usage
 
+#### First Step
 
-## Preprocess
-goal:Write Binary file From edge list
-- format: edge list without n or m or other informations (graph.txt)
-- function: write_graph_binary(graph_name)
+1. Create a build directory and navigate into it:
+    ```bash
+    mkdir build
+    cd build
+    ```
 
+2. Compile the project using CMake:
+    ```bash
+    cmake ..
+    make
+    ```
 
-# Info for files
+### Choice of Algorithm
 
-## sequential_influential_community
+You can select different algorithms by modifying the `CMakefile`:
 
-This folder contains:
-- ClimbStairs algorithm
-- Divide and conquer algorithm
+- To run the `vsht` algorithm, add the following line to the `CMakefile`:
+    ```cmakefile
+    project(den_decom_vsht VERSION 1.0)
+    ```
 
-## parallel_influential_community
+- To run the `hpdd` algorithm, add the following line to the `CMakefile`:
+    ```cmakefile
+    project(den_decom_hpdd VERSION 1.0)
+    ```
 
-This folder contains:
-- Basic parallel algorithm based on block
-- Advanced parallel algorithm based on thread pool
+- To run the `hpdd_plus` algorithm, add the following line to the `CMakefile`:
+    ```cmakefile
+    project(den_decom_hpdd_plus VERSION 1.0)
+    ```
 
+After modifying the `CMakefile`, recompile the project by running `make` again.
 
-# Structure of directory
+### Running the Project
 
-以下是为你的项目 density_decomposition 编写的 CMakeLists.txt 文件。它支持组织清晰的项目结构，并正确包含和链接子目录中的文件：
-CMakeLists.txt
+Once compiled, you can run the project using the following command:
 
-# Minimum CMake version required
-cmake_minimum_required(VERSION 3.10)
-
-# Project name and version
-project(density_decomposition VERSION 1.0)
-
-# Set C++ standard
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-# Enable warnings and debug symbols
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_options(-Wall -Wextra -Wpedantic -g)
-endif()
-
-# Add source directories
-include_directories(utilities)
-include_directories(graph)
-
-# List of source files
-set(SOURCES
-    main.cpp
-    utilities/Log.cpp
-    graph/Graph.cpp
-    graph/MultilayerGraph.cpp
-)
-
-# Add the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
-
-# Optional: Link libraries (if any external libraries are used)
-# target_link_libraries(${PROJECT_NAME} ...)
-
-目录结构说明
-
-假设你的项目目录结构如下：
-
-density_decomposition/
-├── CMakeLists.txt
-├── main.cpp
-├── utilities/
-│   ├── Defines.h
-│   ├── Log.cpp
-│   ├── Log.h
-│   ├── ThreadPool.h
-│   ├── Time.h
-│   ├── Tools.h
-│   ├── Utility.h
-├── graph/
-│   ├── Graph.cpp
-│   ├── Graph.h
-│   ├── MultilayerGraph.cpp
-│   ├── MultilayerGraph.h
+```bash
+./den_decom_vsht

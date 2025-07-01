@@ -2,11 +2,9 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name and version
-
-
-project(den_decom_vsht VERSION 1.0)
+# project(den_decom_vsht VERSION 1.0)
 # project(den_decom_hpdd VERSION 1.0)
-# project(den_decom_hpdd_plus VERSION 1.0)
+project(den_decom_hpdd_plus VERSION 1.0)
 
 
 
@@ -21,8 +19,6 @@ set(CMAKE_BUILD_TYPE Debug)
 # Enable warnings and debug symbols
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-w -g)
-    # add_compile_options(-g -fsanitize=address -fno-omit-frame-pointer -w)
-    # add_link_options(-fsanitize=address)
 endif()
 
 

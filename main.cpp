@@ -10,15 +10,15 @@ int main(int argc, char **argv){
     MultilayerGraph::GetMulGraphClock().Start();
     mg.LoadFromFile(path_str);
     #ifdef VSHT
-    VSHT(mg);
+    DD_VSHT(mg);
     #endif
 
     #ifdef HPDD
-    HPDD(mg);
+    DD_HPDD(mg);
     #endif
 
     #ifdef HPDDPLUS
-    HPDD_Plus(mg);
+    DD_HPDD_Plus(mg);
     #endif
 
 

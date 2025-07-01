@@ -1,26 +1,6 @@
-
-
 #include "../core/Reorientation.h"
 #include "../utilities/MemoryUtils.h"
-#include <omp.h>
 
-static void restore(ReorienNetwork *rn, ui layer, ui old_e, CoreIndex& kci, ui** degs){
-    ui* pstart, *pend, *edgeList;
-    for(ui i = 0; i < layer; i++){
-        pstart = rn[i].get_pstart();
-        pend = rn[i].get_pend();
-        edgeList = rn[i].get_edgeList();
-        for (uint j = old_e; j < kci.e; j++) {
-            ui v = kci.vert[j];
-            for (uint l = pstart[v]; l < pend[v]; l++) {
-                ui u = edgeList[l];
-                degs[i][u]++;
-            }
-        }
-    }
-    kci.e = old_e;
-    kci.s = old_e;
-}
 
 
 
@@ -290,96 +270,6 @@ std::string VecToString(const std::vector<ui>& vec) {
     return result;
 }
 
-static void dfs_peel(ReorienNetwork *rn, vector<vector<ui>> &veck_set, vector<vector<ui>> &vertex_set, vector<ui> &veck_set_to_size,
-vector<ui> veck, vector<bool> level_vis, CoreIndex& kci, uint** degs,
-vector<ui>& iter_time, ui lev_start, ui &num_of_core, ui &num_of_computed_core , ui layer, ui n)
-{
-    ui old_e = kci.e;
-    bool *global_vis = new bool[n]();
-    for(ui i = 0; i < n; i++) global_vis[i] = level_vis[i];
-
-    for(ui k = lev_start; k < layer; k++){
-
-        // vector<ReorienNetworkSnapshot> snapshots(layer);
-        // for (ui i = 0; i < layer; i++) {
-        //     rn[i].takeSnapshot(snapshots[i]);
-        // }
-
-        for (uint j = old_e; j < kci.n; j++) {
-            ui v = kci.vert[j];
-            if (degs[k][v] <= veck[k]) {
-                kci.Remove(v);
-            }
-        }
-        ui len = veck_set.size();
-        assert(len>0);
-        veck[k]++;
-        if(kci.e != old_e)
-            compute_k_core_set_multilayer_with_index(rn,veck,layer,kci,degs);
-        
-        for(ui i = 0; i < n; i++){
-            global_vis[i] = true;
-            if(kci.pos[i] >= kci.e)
-                global_vis[i] = false;
-        }
-        for(ui i = 0; i < layer; i++){
-            rn[i].use_graph(global_vis);
-        }
-        //prune technique
-
-        // bool lb_noless_than_vk = rn[k].compute_lower_bound(veck[k],veck);
-        // if(lb_noless_than_vk){
-        //     // printf("lb_noless_than_vk is true, k: %u\n",k);
-        //     // for(ui i = 0; i < layer; i++)
-        //     //     printf("%u ",veck[i]);
-        //     // printf("\n");
-        //     for(ui i = 0; i < n; i++) level_vis[i] = global_vis[i];
-        //     dfs_peel(rn,veck_set,vertex_set,veck_set_to_size,veck,level_vis,k,num_of_core,num_of_computed_core,layer,n);
-        // }
-        // else
-        {
-            ui iters = 1;
-            // unordered_set<ui> kds = KDenseSub(rn,veck,k,layer,iters);
-            vector<ui> kds = KDenseSub(rn,veck,k,layer,iters);
-            num_of_computed_core++;
-            if(kds.size() != 0){
-                for(ui i = 0; i < n; i++) level_vis[i] = true;
-                num_of_core++;
-                vector<ui> vertex_tmp;
-                vertex_tmp.reserve(kds.size());
-                for(auto x : kds) {
-                    vertex_tmp.push_back(x);
-                    level_vis[x] = false;
-                }
-                ui tmp_e = kci.e;
-                for(ui x = 0; x < n; x++){
-                    if(global_vis[x])continue;
-                    if(level_vis[x]){
-                        kci.Remove(x);
-                    }
-                }
-                if(kci.e != tmp_e)
-                    compute_k_core_set_multilayer_with_index(rn,veck,layer,kci,degs);
-                // sort(vertex_tmp.begin(),vertex_tmp.end());
-                vertex_set.push_back(vertex_tmp);
-                veck_set.push_back(veck);
-                veck_set_to_size.push_back(kds.size());
-                iter_time.push_back(iters);
-                dfs_peel(rn,veck_set,vertex_set,veck_set_to_size,veck,level_vis,kci,degs,iter_time,k,num_of_core,num_of_computed_core,layer,n);
-            }
-
-        }
-        veck[k]--;
-        restore(rn,layer,old_e,kci,degs);
-        // for (ui i = 0; i < layer; i++) {
-        //     rn[i].restoreSnapshot(snapshots[i]);
-        // }
-    }
-
-    delete[] global_vis;
-}
-
-
 
 static ui compute_sub_satisfy_vec(ui index, vector<ui> &filter_vec, ReorienNetwork* rn)
 {
@@ -418,7 +308,7 @@ static void process_bottom_up_high_dimen(vector<vector<bool>> &filter_sub, vecto
     bool *arr_vis = new bool[n]();
     vector<vector<bool>> filter_sub_new;
     vector<vector<ui>> filter_vec_new;
-    log_info(MultilayerGraph::GetMulGraphClock().Count("index: %u, filter_sub.size: %u",index,filter_sub.size()));
+    // log_info(MultilayerGraph::GetMulGraphClock().Count("index: %u, filter_sub.size: %u",index,filter_sub.size()));
 
     veck_set.clear();
     veck_set_to_size.clear();
@@ -485,7 +375,7 @@ static void process_high_dimen_incremental(vector<vector<bool>> &filter_sub, vec
 
 //Hirarchical progressive
 
-static void HPDD(MultilayerGraph &mg){
+static void DD_HPDD(MultilayerGraph &mg){
     double mem;
     log_info(MultilayerGraph::GetMulGraphClock().Count("Hierarchical progressive method starts"));
     ui layer = mg.GetLayerNumber();
@@ -582,7 +472,7 @@ static void Recursive(ReorienNetwork *rn, bool* vis, ui index_sub, ui index, ui 
 
 
 //Space efficient method based divide and conquer
-static void SpaceEfficientDivAndCon(MultilayerGraph &mg){
+static void DD_HPDD_Plus(MultilayerGraph &mg){
     double mem;
     log_info(MultilayerGraph::GetMulGraphClock().Count("Space efficient method starts"));
     ui layer = mg.GetLayerNumber();
@@ -687,9 +577,7 @@ static void ComputeFatherIntersec(vector<vector<ui>> &vertex_set,bool *local_vis
 
 
 
-
-
-static void VSHT(MultilayerGraph &mg){
+static void DD_VSHT(MultilayerGraph &mg){
     double mem;
     log_info(MultilayerGraph::GetMulGraphClock().Count("VSHT starts"));
     ui layer = mg.GetLayerNumber();
