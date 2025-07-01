@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/quality.dir/main.cpp.o CMakeFiles/quality.dir/utilities/Log.cpp.o CMakeFiles/quality.dir/graph/Graph.cpp.o CMakeFiles/quality.dir/graph/MultilayerGraph.cpp.o CMakeFiles/quality.dir/core/Reorientation.cpp.o  -o quality 
