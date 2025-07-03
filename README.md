@@ -48,4 +48,4 @@ After modifying the `CMakefile`, recompile the project by running `make` again.
 Once compiled, you can run the project using the following command:
 
 ```bash
-./den_decom_vsht
+./den_decom_vsht  ../dataset/homo
