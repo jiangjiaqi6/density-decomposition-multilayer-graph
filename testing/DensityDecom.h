@@ -427,16 +427,10 @@ static void DD_HPDD(MultilayerGraph &mg){
     // }
     // out.close();
 
-    double total_flow_time = 0, total_update_graph_time = 0;
-    for(ui i = 0; i < layer; i++){
-        total_flow_time += rn[i].get_network_flow_time();
-        total_update_graph_time += rn[i].get_update_graph_time();
-        // printf("%u layer, number of sub: %u\n",i,sub_num_each_layer[i]);
-    }
+
 
     log_info(MultilayerGraph::GetMulGraphClock().Count("The number of dense subgraph: %u, the number of computed dense subgraph: %u",num_of_dense_sub,num_of_computed_dense_sub));
     log_info(MultilayerGraph::GetMulGraphClock().Count("Memory: %lf MB, the number of times SLBF is called %u",mem,num_of_call));
-    log_info(MultilayerGraph::GetMulGraphClock().Count("Network flow time: %lf s, update graph time: %lf s",total_flow_time,total_update_graph_time));
     log_info(MultilayerGraph::GetMulGraphClock().Count("HPDD method ends!"));
     
     delete[] rn;
@@ -535,7 +529,6 @@ static void DD_HPDD_Plus(MultilayerGraph &mg){
 
     log_info(MultilayerGraph::GetMulGraphClock().Count("The number of dense subgraph: %u, the number of computed dense subgraphs: %u",num_of_dense_sub,num_of_computed_dense_sub));
     log_info(MultilayerGraph::GetMulGraphClock().Count("Memory: %lf MB, the call of slfbe is: ",mem, iter));
-    log_info(MultilayerGraph::GetMulGraphClock().Count("Network flow time: %lf s, update graph time: %lf s, reconfig info time: %lf s, peel core time: %lf s",total_flow_time,total_update_graph_time,total_reconfig_info_time,total_peel_core_time));
     log_info(MultilayerGraph::GetMulGraphClock().Count("Space efficient method ends!"));
     
     delete[] rn;
@@ -681,6 +674,7 @@ static void DD_VSHT(MultilayerGraph &mg){
 
     delete[] global_vis;
     delete[] local_vis;
+    mem = GetPeakRSSInMB();
 
     //output all dense subgraph
     // string ss = mg.GetDataPath() + "dense_subgraph_output_distinct.txt";
@@ -715,16 +709,9 @@ static void DD_VSHT(MultilayerGraph &mg){
     // }
     // out.close();
 
-    double total_flow_time = 0, total_update_graph_time = 0;
-    for(ui i = 0; i < layer; i++){
-        total_flow_time += rn[i].get_network_flow_time();
-        total_update_graph_time += rn[i].get_update_graph_time();
-    }
 
     log_info(MultilayerGraph::GetMulGraphClock().Count("The number of dense sub: %u, the number of computed dense sub: %u",num_of_den_sub,num_of_computed_den_sub));
-    mem = GetPeakRSSInMB();
     log_info(MultilayerGraph::GetMulGraphClock().Count("Memory: %lf MB, the number of times SLBF is called: %u",mem,iter_time));
-    log_info(MultilayerGraph::GetMulGraphClock().Count("Network flow time: %lf s, update graph time: %lf s, iter times: %u",total_flow_time,total_update_graph_time,iter_time));
     log_info(MultilayerGraph::GetMulGraphClock().Count("Naive method ends!"));
     delete[] rn;
 }
