@@ -6,6 +6,44 @@ This project focuses on the density decomposition of multilayer graphs.
 
 Download datasets and put them into the `/dataset` folder. An example file `homo` is provided.
 
+The missing datasets are available at [FirmCore](https://github.com/joint-em/FTCS/tree/main/Code/Datasets)  and [multilayer kCore](https://github.com/egalimberti/multilayer_core_decomposition).
+
+### Data Preparation
+
+The algorithm requires the multilayer graph to be decomposed into separate files for each layer, accompanied by a configuration file (`mlg.conf`). 
+
+If your dataset is stored in a **single file** format, please use the provided preprocessing script to convert it.
+
+###  Directory Structure
+Before running the script, ensure your project directory is organized as follows:
+```text
+dataset/
+├── split_graph.py              # The preprocessing script
+└── single_multilayer_file/     # Place your raw .txt files here
+    ├── DBLP2.txt
+    └── ...
+```
+
+### Input Format
+The input single file should follow this structure:
+- **Header (1st line):** `#layers #nodes #edges`
+- **Body (Subsequent lines):** `layer_id u v` (where `u` and `v` are node IDs)
+
+
+**Example (`raw_graph.txt`):**
+```text
+3 100 200
+0 1 2
+0 2 3
+1 1 5
+2 4 6
+...
+```
+###  Process the DBLP2 dataset
+```
+python split_graph.py DBLP2
+```
+
 ## Usage
 
 #### First Step
